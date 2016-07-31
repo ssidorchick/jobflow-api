@@ -25,7 +25,7 @@ if (!nconf.get('PRODUCTION')) {
 
 if (nconf.get('PRODUCTION')) {
   manifest.connections[0].host = '0.0.0.0';
-  manifest.connections[0].port = process.env.PORT;
+  manifest.connections[0].port = nconf.get('PORT');
 }
 
 Glue.compose(manifest, {relativeTo: __dirname}, (err, server) => {
@@ -37,6 +37,6 @@ Glue.compose(manifest, {relativeTo: __dirname}, (err, server) => {
 
   server.on('internalError', (request, err) => console.log(err.data.stack));
   server.start(() => {
-    console.log('✅  Server is listening on ' + server.info.uri.toLowerCase());
+    console.log('✅ Server is listening on ' + server.info.uri.toLowerCase());
   });
 });
