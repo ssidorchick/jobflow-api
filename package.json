@@ -1,0 +1,44 @@
+{
+  "name": "jobflow",
+  "version": "0.1.0",
+  "description": "Jobflow api project",
+  "author": "Sergey Sidorchick",
+  "engines": {
+    "node": "6.x"
+  },
+  "dependencies": {
+    "boom": "^3.1.2",
+    "glob": "^7.0.0",
+    "glue": "^3.2.0",
+    "hapi": "^14.0.0",
+    "hapi-auth-jwt2": "^7.0.0",
+    "mongoose": "^4.4.10",
+    "plugo": "^0.3.6"
+  },
+  "devDependencies": {
+    "babel-core": "^6.7.4",
+    "babel-preset-node6": "^11.0.0",
+    "blipp": "^2.3.0",
+    "code": "^3.0.0",
+    "eslint": "^3.0.0",
+    "good": "^7.0.0",
+    "good-console": "^6.0.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-if": "^2.0.0",
+    "gulp-load-plugins": "^1.2.0",
+    "gulp-nodemon": "^2.0.6",
+    "lab": "^10.1.0",
+    "pm2": "^1.0.2"
+  },
+  "scripts": {
+    "test": "./node_modules/lab/bin/lab -v",
+    "eslint": "eslint . --ext .js --ignore node_modules/**"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es6": true
+    }
+  }
+}
