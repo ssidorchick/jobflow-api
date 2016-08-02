@@ -7,20 +7,24 @@
     "node": "6.x"
   },
   "dependencies": {
+    "bell": "^8.0.1",
     "boom": "^3.1.2",
+    "catbox-memory": "^2.0.3",
     "glob": "^7.0.0",
     "glue": "^3.2.0",
     "hapi": "^14.0.0",
     "hapi-auth-jwt2": "^7.0.0",
     "mongoose": "^4.4.10",
     "nconf": "^0.8.4",
-    "plugo": "^0.3.6"
+    "plugo": "^0.3.6",
+    "upwork-api": "^1.2.0"
   },
   "devDependencies": {
     "babel-core": "^6.7.4",
     "babel-preset-node6": "^11.0.0",
     "blipp": "^2.3.0",
     "code": "^3.0.0",
+    "del": "^2.2.2",
     "eslint": "^3.0.0",
     "good": "^7.0.0",
     "good-console": "^6.0.0",

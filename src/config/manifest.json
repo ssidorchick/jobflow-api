@@ -1,4 +1,13 @@
 {
+  "server": {
+    "cache": [
+      {
+        "name": "memoryCache",
+        "engine": "catbox-memory",
+        "partition": "cache"
+      }
+    ]
+  },
   "connections": [
     {
       "host": "localhost",
@@ -19,6 +28,18 @@
       }
     },
     {
+      "plugin": "bell",
+      "options": {
+        "select": "api"
+      }
+    },
+    {
+      "plugin": "./config",
+      "options": {
+        "select": "api"
+      }
+    },
+    {
       "plugin": "./auth",
       "options": {
         "select": "api"
@@ -26,6 +47,12 @@
     },
     {
       "plugin": "./controllers",
+      "options": {
+        "select": "api"
+      }
+    },
+    {
+      "plugin": "./models",
       "options": {
         "select": "api"
       }

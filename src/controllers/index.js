@@ -1,9 +1,15 @@
 import Plugo from 'plugo';
 
-exports.register = (plugin, options, next) => {
-  plugin.dependency('auth');
+const internals = {};
 
-  Plugo.expose({name: 'handlers', path: __dirname + '/handlers'}, plugin, next);
+internals.load = (plugin, next) => {
+  Plugo.expose({name: 'handlers', path: `${__dirname}/handlers`}, plugin, next);
+};
+
+exports.register = (plugin, options, next) => {
+  plugin.dependency('auth', internals.load);
+
+  next();
 };
 
 exports.register.attributes = {

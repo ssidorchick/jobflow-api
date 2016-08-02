@@ -1,15 +1,10 @@
 import Glue from 'glue';
 import Hapi from 'hapi';
 import mongoose from 'mongoose';
-import nconf from 'nconf';
-
+import {config} from './config';
 import manifest from './config/manifest.json';
 
-nconf.argv()
-  .env()
-  .file('src/config/local.json');
-
-if (!nconf.get('PRODUCTION')) {
+if (!config.get('PRODUCTION')) {
   manifest.registrations.push({
     "plugin": {
       "register": "blipp",
@@ -23,9 +18,9 @@ if (!nconf.get('PRODUCTION')) {
   }
 }
 
-if (nconf.get('PRODUCTION')) {
+if (config.get('PRODUCTION')) {
   manifest.connections[0].host = '0.0.0.0';
-  manifest.connections[0].port = nconf.get('PORT');
+  manifest.connections[0].port = config.get('PORT');
 }
 
 Glue.compose(manifest, {relativeTo: __dirname}, (err, server) => {
@@ -33,7 +28,7 @@ Glue.compose(manifest, {relativeTo: __dirname}, (err, server) => {
     console.log('server.register err:', err);
   }
 
-  mongoose.connect(nconf.get('MONGODB_URI'));
+  mongoose.connect(config.get('MONGODB_URI'));
 
   server.on('internalError', (request, err) => console.log(err.data.stack));
   server.start(() => {

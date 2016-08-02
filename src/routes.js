@@ -1,7 +1,11 @@
-exports.register = (plugin, options, next) => {
-  plugin.dependency('controllers');
+const internals = {};
 
-  let handlers = plugin.plugins.controllers.handlers;
+internals.load = (plugin, next) => {
+  const handlers = plugin.plugins.controllers.handlers;
+  const models = plugin.plugins.models.models;
+  plugin.bind({
+    models: models
+  });
 
   plugin.route([
     {method: 'GET', path: '/', config: handlers.Index.hello},
@@ -11,8 +15,16 @@ exports.register = (plugin, options, next) => {
     {method: 'POST', path: '/todo', config: handlers.Todo.create},
     {method: 'PATCH', path: '/todo', config: handlers.Todo.update},
     {method: 'DELETE', path: '/todo/{id}', config: handlers.Todo.remove},
+    {method: 'GET', path: '/oauth/upwork', config: handlers.Oauth.upworkLogin},
+    {method: ['GET', 'POST'], path: '/oauth/facebook', config: handlers.Oauth.facebookLogin},
     {method: 'GET', path: '/{path*}', config: handlers.Index.notFound}
   ]);
+
+  next();
+};
+
+exports.register = (plugin, options, next) => {
+  plugin.dependency(['controllers', 'models'], internals.load);
 
   next();
 }

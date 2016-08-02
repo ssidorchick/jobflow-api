@@ -1,6 +1,15 @@
 import gulp from 'gulp';
+import gulpLoadPlugins from 'gulp-load-plugins';
 
-const $ = require('gulp-load-plugins')();
+const $ = gulpLoadPlugins({
+  pattern: ['gulp-*', 'del']
+});
+
+function clean() {
+  return $.del('.tmp');
+}
+
+gulp.task('clean', clean);
 
 function build(dest) {
   return gulp.src('src/**/*.*')
@@ -10,10 +19,10 @@ function build(dest) {
     .pipe(gulp.dest(dest));
 }
 
-gulp.task('build', () => build('dist'));
-gulp.task('build:dev', () => build('.tmp'));
+gulp.task('build', ['clean'], () => build('dist'));
+gulp.task('build:dev', ['clean'], () => build('.tmp'));
 
-gulp.task('start', ['build:dev'], (cb) => {
+gulp.task('start', ['build:dev'], (done) => {
   let started = false;
 
   return $.nodemon({
@@ -26,9 +35,9 @@ gulp.task('start', ['build:dev'], (cb) => {
   })
   .on('start', () => {
 		if (!started) {
-			cb();
-			started = true; 
-		} 
+			done();
+			started = true;
+		}
 	});
 });
 
