@@ -1,6 +1,7 @@
 import Hoek from 'hoek';
 import UpworkApi from 'upwork-api';
 import {Auth} from 'upwork-api/lib/routers/auth';
+import {Users} from 'upwork-api/lib/routers/organization/users.js';
 import nconf from 'nconf';
 
 // TODO: Refactor
@@ -30,8 +31,8 @@ internals.Upwork = class {
 
   getUserInfo() {
     return new Promise((resolve, reject) => {
-      const auth = new Auth(this._upworkApi);
-      auth.getUserInfo((err, data) => {
+      const users = new Users(this._upworkApi);
+      users.getMyInfo((err, data) => {
         if (err) {
           reject(err);
         } else {
