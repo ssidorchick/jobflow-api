@@ -1,11 +1,11 @@
 export const hello = {
   handler: (request, reply) => {
+    console.log(request.auth.credentials);
     return reply({result: 'Hello hapi!'});
   }
 };
 
 export const restricted = {
-  auth: 'jwt',
   handler: (request, reply) => {
     return reply({result: 'Restricted!'});
   }

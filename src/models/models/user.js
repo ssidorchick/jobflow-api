@@ -8,7 +8,7 @@ internals._defaults = {};
 
 internals.ProviderSchema = new Mongoose.Schema({
   token: {type: String, required: true},
-  secret: {type: String, required: true}
+  secret: {type: String}
 }, {
   _id: false,
   versionKey: false
@@ -58,9 +58,11 @@ internals.UserSchema.statics.create = function(data, providers) {
 };
 
 internals.UserSchema.methods.update = function(data, providers) {
-  this.first_name = data.user.first_name;
-  this.last_name = data.user.last_name
-  this.providers = providers;
+  if (data) {
+    this.first_name = data.user.first_name;
+    this.last_name = data.user.last_name
+  }
+  Object.assign(this.providers, providers);
   return this.save();
 };
 
