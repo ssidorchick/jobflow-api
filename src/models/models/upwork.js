@@ -1,6 +1,5 @@
 import Hoek from 'hoek';
 import UpworkApi from 'upwork-api';
-import {Auth} from 'upwork-api/lib/routers/auth';
 import {Users} from 'upwork-api/lib/routers/organization/users.js';
 import nconf from 'nconf';
 

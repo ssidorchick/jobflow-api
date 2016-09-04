@@ -1,11 +1,8 @@
 import mongoose, {Schema} from 'mongoose';
-import transform from './helpers/transform';
 
 const TodoSchema = new Schema({
   name: {type: String, required: true},
 });
-
-transform(TodoSchema);
 
 TodoSchema.statics.getAll = function() {
   return this.find()
