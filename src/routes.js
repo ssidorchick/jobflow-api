@@ -1,9 +1,11 @@
 const internals = {};
 
 internals.load = (plugin, next) => {
+  const config = plugin.plugins.config.config;
   const handlers = plugin.plugins.controllers.handlers;
   const models = plugin.plugins.models.models;
   plugin.bind({
+    config: config,
     models: models
   });
 
@@ -24,7 +26,7 @@ internals.load = (plugin, next) => {
 };
 
 exports.register = (plugin, options, next) => {
-  plugin.dependency(['controllers', 'models'], internals.load);
+  plugin.dependency(['config', 'controllers', 'models'], internals.load);
 
   next();
 }

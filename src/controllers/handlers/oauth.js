@@ -7,6 +7,7 @@ exports.upworkLogin = {
       return reply('Authentication failed due to: ' + request.auth.error.message);
     }
 
+    const config = this.config;
     const User = this.models.User;
     const Upwork = this.models.Upwork;
 
@@ -25,7 +26,7 @@ exports.upworkLogin = {
           })
           .then(user => {
             request.cookieAuth.set({userId: user.id});
-            reply(user);
+            reply.redirect(config.get('OAUTH_REDIRECT'));
           })
           .catch(err => reply(Boom.badImplementation(err)));
       });
@@ -39,12 +40,13 @@ exports.facebookLogin = {
       return reply('Authentication failed due to: ' + request.auth.error.message);
     }
 
+    const config = this.config;
     const User = this.models.User;
     const userId = request.state.sid.userId;
 
     User.get({id: userId})
       .then(user => user.update(null, {facebook: {token: request.auth.credentials.token}}))
-      .then(user => reply(user))
+      .then(user => reply.redirect(config.get('OAUTH_REDIRECT')))
       .catch(err => reply(Boom.badImplementation(err)));
   }
 };
