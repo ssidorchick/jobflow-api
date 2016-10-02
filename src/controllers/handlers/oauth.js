@@ -13,20 +13,21 @@ exports.upworkLogin = {
 
     Upwork.setAccessToken(request.auth.credentials);
 
+    const {authCode, redirectURISuccess} = request.state['messenger_linking'];
     const upwork = new Upwork();
     upwork.getUserInfo()
       .then(result => {
         User.get({email: result.user.email})
           .then(user => {
             if (!user) {
-              return User.create(result, {upwork: request.auth.credentials});
+              return User.create(result, request.auth.credentials, {auth_code: authCode});
             } else {
-              return user.update(result, {upwork: request.auth.credentials});
+              return user.update(result, request.auth.credentials, {auth_code: authCode});
             }
           })
           .then(user => {
             request.cookieAuth.set({userId: user.id});
-            reply.redirect(config.get('OAUTH_REDIRECT'));
+            reply.redirect(redirectURISuccess);
           })
           .catch(err => reply(Boom.badImplementation(err)));
       });

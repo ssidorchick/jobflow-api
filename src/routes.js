@@ -19,6 +19,9 @@ internals.load = (plugin, next) => {
     {method: 'DELETE', path: '/todo/{id}', config: handlers.Todo.remove},
     {method: 'GET', path: '/oauth/upwork', config: handlers.Oauth.upworkLogin},
     {method: ['GET', 'POST'], path: '/oauth/facebook', config: handlers.Oauth.facebookLogin},
+    {method: 'GET', path: '/messenger/webhook', config: handlers.Messenger.get},
+    {method: 'POST', path: '/messenger/webhook', config: handlers.Messenger.post},
+    {method: 'GET', path: '/messenger/authorize', config: handlers.Messenger.authorize},
     {method: 'GET', path: '/{path*}', config: handlers.Index.notFound}
   ]);
 

@@ -14,9 +14,17 @@ internals.ProviderSchema = new Mongoose.Schema({
   versionKey: false
 });
 
-internals.ProvidersSchema = new Mongoose.Schema({
-  upwork: internals.ProviderSchema,
-  facebook: internals.ProviderSchema
+internals.MessengerSchema = new Mongoose.Schema({
+  auth_code: {type: String},
+  sender_id: {type: String}
+}, {
+  _id: false,
+  versionKey: false
+});
+
+internals.ConnectionsSchema = new Mongoose.Schema({
+  upwork: {type: internals.ProviderSchema, required: true},
+  messenger: {type: internals.MessengerSchema, required: true}
 }, {
   _id: false,
   versionKey: false
@@ -26,7 +34,7 @@ internals.UserSchema = new Mongoose.Schema({
   email: {type: String, required: true},
   first_name: {type: String, required: true},
   last_name: {type: String, required: true},
-  providers: internals.ProvidersSchema
+  connections: {type: internals.ConnectionsSchema, required: true}
 }, {
   timestamps: {
     createdAt: 'created_at',
@@ -36,33 +44,43 @@ internals.UserSchema = new Mongoose.Schema({
 
 transform(internals.UserSchema);
 
-internals.UserSchema.statics.get = function({id, email}) {
+internals.UserSchema.statics.get = function({id, email, auth_code}) {
   if (id) {
     return this.findById(id)
       .exec();
-  } else {
+  } else if (email) {
     return this.findOne({email})
       .exec();
+  } else if (auth_code) {
+    return this.findOne({'connections.messenger.auth_code': auth_code})
+      .exec();
+  } else {
+    throw Error(`Cannot search user by query: ${arguments}`);
   }
 };
 
-internals.UserSchema.statics.create = function(data, providers) {
+internals.UserSchema.statics.create = function(data, upwork, messenger) {
   const userData = {
     email: data.user.email,
     first_name: data.user.first_name,
     last_name: data.user.last_name,
-    providers
+    connections: {upwork, messenger}
   };
   const user = new this(userData);
   return user.save();
 };
 
-internals.UserSchema.methods.update = function(data, providers) {
+internals.UserSchema.methods.update = function(data, upwork, messenger) {
   if (data) {
     this.first_name = data.user.first_name;
     this.last_name = data.user.last_name
   }
-  Object.assign(this.providers, providers);
+  if (upwork) {
+    this.connections.upwork = upwork;
+  }
+  if (messenger) {
+    this.connections.messenger = messenger;
+  }
   return this.save();
 };
 

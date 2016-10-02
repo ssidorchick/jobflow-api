@@ -30,6 +30,20 @@ Glue.compose(manifest, {relativeTo: __dirname}, (err, server) => {
 
   mongoose.connect(config.get('MONGODB_URI'));
 
+  const cache = server.cache({segment: 'messengerUsers', expiresIn: 3 * 24 * 60 * 60 * 1000});
+  server.app.cache = cache;
+
+  const cookieOptions = {
+    encoding: 'iron',
+    path: '/',
+    password: 'caecd063dd9b66a16bbd3d52477dc94a66032c1adcf492a78e166df994120ad5',
+    isSecure: false,                  // Defaults to true
+    ignoreErrors: true,
+    clearInvalid: true
+  };
+
+  server.state('messenger_linking', cookieOptions);
+
   server.on('internalError', (request, err) => console.log(err.data.stack));
   server.start(() => {
     console.log('✅ Server is listening on ' + server.info.uri.toLowerCase());

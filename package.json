@@ -17,7 +17,8 @@
     "mongoose": "^4.4.10",
     "nconf": "^0.8.4",
     "plugo": "^0.3.6",
-    "upwork-api": "^1.2.0"
+    "upwork-api": "^1.2.0",
+    "wreck": "^10.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.7.4",
