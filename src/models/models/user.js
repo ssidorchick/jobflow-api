@@ -2,13 +2,14 @@ import Hoek from 'hoek';
 import Mongoose from 'mongoose';
 import transform from './helpers/transform';
 
+
 const internals = {};
 
 internals._defaults = {};
 
 internals.ProviderSchema = new Mongoose.Schema({
-  token: {type: String, required: true},
-  secret: {type: String}
+  accessToken: {type: String, required: true},
+  accessTokenSecret: {type: String}
 }, {
   _id: false,
   versionKey: false
@@ -44,19 +45,28 @@ internals.UserSchema = new Mongoose.Schema({
 
 transform(internals.UserSchema);
 
-internals.UserSchema.statics.get = function({id, email, auth_code}) {
+internals.UserSchema.statics.get = function({id, query}) {
   if (id) {
     return this.findById(id)
       .exec();
-  } else if (email) {
-    return this.findOne({email})
-      .exec();
-  } else if (auth_code) {
-    return this.findOne({'connections.messenger.auth_code': auth_code})
+  } else if (query) {
+    return this.findOne(query)
       .exec();
   } else {
     throw Error(`Cannot search user by query: ${arguments}`);
   }
+};
+
+internals.UserSchema.statics.getByEmail = function(value) {
+  return this.get({query: {email: value}});
+};
+
+internals.UserSchema.statics.getByAuthCode = function(value) {
+  return this.get({query: {'connections.messenger.auth_code': value}});
+};
+
+internals.UserSchema.statics.getByRecipientId = function(value) {
+  return this.get({query: {'connections.messenger.sender_id': value}});
 };
 
 internals.UserSchema.statics.create = function(data, upwork, messenger) {

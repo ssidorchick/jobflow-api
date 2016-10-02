@@ -21,8 +21,9 @@ exports.post = {
     const payload = request.payload;
     const config = this.config;
     const User = this.models.User;
+    const Upwork = this.models.Upwork;
     const Messenger = this.models.Messenger;
-    const messenger = new Messenger({config, User});
+    const messenger = new Messenger({config, User, Upwork});
 
     messenger.readMessage(payload);
     reply();

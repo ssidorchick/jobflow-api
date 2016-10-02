@@ -10,25 +10,21 @@ exports.upworkLogin = {
     const config = this.config;
     const User = this.models.User;
     const Upwork = this.models.Upwork;
-
-    Upwork.setAccessToken(request.auth.credentials);
-
     const {authCode, redirectURISuccess} = request.state['messenger_linking'];
-    const upwork = new Upwork();
+    const {token: accessToken, secret: accessTokenSecret} = request.auth.credentials;
+    const upwork = new Upwork({accessToken, accessTokenSecret});
+
     upwork.getUserInfo()
       .then(result => {
-        User.get({email: result.user.email})
+        User.getByEmail(result.user.email)
           .then(user => {
             if (!user) {
-              return User.create(result, request.auth.credentials, {auth_code: authCode});
+              return User.create(result, {accessToken, accessTokenSecret}, {auth_code: authCode});
             } else {
-              return user.update(result, request.auth.credentials, {auth_code: authCode});
+              return user.update(result, {accessToken, accessTokenSecret}, {auth_code: authCode});
             }
           })
-          .then(user => {
-            request.cookieAuth.set({userId: user.id});
-            reply.redirect(redirectURISuccess);
-          })
+          .then(user => reply.redirect(redirectURISuccess))
           .catch(err => reply(Boom.badImplementation(err)));
       });
   }

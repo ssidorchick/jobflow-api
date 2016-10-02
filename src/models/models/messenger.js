@@ -10,6 +10,7 @@ internals.Messenger = class {
   constructor(options) {
     this.config = options.config;
     this.User = options.User;
+    this.Upwork = options.Upwork;
   }
 
   readMessage(data) {
@@ -99,6 +100,25 @@ internals.Messenger = class {
     this._sendMessage(payload);
   }
 
+  sendJobsMessage(recipientId) {
+    this.User.getByRecipientId(recipientId)
+      .then(user => {
+        const upwork = new this.Upwork(user.connections.upwork);
+
+        return upwork.getJobs({q: 'javascript'}, 5);
+      })
+      .then(result => {
+        const payload = {
+          recipient: {id: recipientId},
+          message: {text: JSON.stringify(result, null, 2)}
+        };
+
+        console.log('sending jobs message', recipientId);
+        return this._sendMessage(payload)
+      })
+      .catch(err => console.log(err));
+  }
+
   _sendMessage(payload) {
     const url = `https://graph.facebook.com/v2.6/me/messages?access_token=${this.config.get('MESSENGER_ACCESS_TOKEN')}`;
 
@@ -108,7 +128,7 @@ internals.Messenger = class {
           const {recipient_id: recipientId, message_id: messageId} = payload;
           resolve({recipientId, messageId});
         } else {
-          reject(err || res);
+          reject(err || payload.error);
         }
       });
     });
@@ -118,7 +138,7 @@ internals.Messenger = class {
     const senderId = ev.sender.id;
     const auth_code = ev.account_linking.authorization_code;
 
-    this.User.get({auth_code})
+    this.User.getByAuthCode(auth_code)
       .then(user => {
         if (!user) {
           throw Error(`User not found. auth_code: ${auth_code}`);
@@ -157,6 +177,9 @@ internals.Messenger = class {
           break;
         case 'generic':
           this.sendGenericMessage(senderId);
+          break;
+        case 'get jobs':
+          this.sendJobsMessage(senderId);
           break;
         default:
           this.sendTextMessage(senderId, messageText);
