@@ -18,8 +18,8 @@ internals.Messenger = class {
       // Iterate over each entry
       // There may be multiple if batched
       data.entry.forEach(pageEntry => {
-        const pageID = pageEntry.id;
-        const timeOfevent = pageEntry.time;
+        const pageId = pageEntry.id;
+        const timeOfEvent = pageEntry.time;
 
         pageEntry.messaging.forEach(ev => {
           if (ev.account_linking) {
@@ -105,7 +105,7 @@ internals.Messenger = class {
       .then(user => {
         const upwork = new this.Upwork(user.connections.upwork);
 
-        return upwork.getJobs({q: 'javascript'}, 5);
+        return upwork.getJobs(user.upwork_filters.toJSON(), 5);
       })
       .then(result => {
         const payload = {
@@ -117,6 +117,48 @@ internals.Messenger = class {
         return this._sendMessage(payload)
       })
       .catch(err => console.log(err));
+  }
+
+  sendJobCategoriesMessage(recipientId) {
+    this.User.getByRecipientId(recipientId)
+      .then(user => {
+        const upwork = new this.Upwork(user.connections.upwork);
+
+        return upwork.getJobCategories();
+      })
+      .then(result => {
+        const payload = {
+          recipient: {id: recipientId},
+          message: {text: JSON.stringify(result, null, 2)}
+        };
+
+        console.log('sending job categories message', recipientId);
+        return this._sendMessage(payload)
+      })
+      .catch(err => console.log(err));
+  }
+
+  setUpworkFilterValue(recipientId, filter, value) {
+    this.User.getByRecipientId(recipientId)
+      .then(user => {
+        if (!user) {
+          throw new Error('User not found');
+        }
+
+        user.upwork_filters.setFilter(filter, value);
+        return user.save();
+      })
+      .then(() => {
+        return this.sendTextMessage(recipientId, `Filter ${filter} successfully set`);
+      })
+      .catch(err => {
+        if (err.name === 'StrictModeError') {
+          this.sendTextMessage(recipientId, `Filter key ${err.path} doesn't exist`);
+        } else {
+          console.log(err);
+          return this.sendTextMessage(recipientId, `Failed to set filter ${filter}`);
+        }
+      });
   }
 
   _sendMessage(payload) {
@@ -168,6 +210,13 @@ internals.Messenger = class {
       // If we receive a text message, check to see if it matches any special
       // keywords and send back the corresponding example. Otherwise, just echo
       // the text we received.
+      let match = /^set filter (\w+) (.+)$/.exec(messageText);
+      if (match) {
+        const [, filter, value] = match;
+        this.setUpworkFilterValue(senderId, filter, value);
+        return;
+      }
+
       switch (messageText) {
         case 'login':
           this.sendLinkMessage(senderId);
@@ -180,6 +229,9 @@ internals.Messenger = class {
           break;
         case 'get jobs':
           this.sendJobsMessage(senderId);
+          break;
+        case 'get job categories':
+          this.sendJobCategoriesMessage(senderId);
           break;
         default:
           this.sendTextMessage(senderId, messageText);

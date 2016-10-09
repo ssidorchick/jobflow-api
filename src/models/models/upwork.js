@@ -1,6 +1,7 @@
 import UpworkApi from 'upwork-api';
 import {Users} from 'upwork-api/lib/routers/organization/users';
 import {Search} from 'upwork-api/lib/routers/jobs/search';
+import {Metadata} from 'upwork-api/lib/routers/metadata';
 import Nconf from 'nconf';
 
 
@@ -44,6 +45,20 @@ internals.Upwork = class {
             .map(job => job.title)
             .slice(0, count);
 
+          resolve(result);
+        }
+      });
+    });
+  }
+
+  getJobCategories() {
+    return new Promise((resolve, reject) => {
+      const metadata = new Metadata(this._upworkApi);
+      metadata.getCategoriesV2((err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          const result = data.categories.map(item => item.title);
           resolve(result);
         }
       });

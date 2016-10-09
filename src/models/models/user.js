@@ -31,11 +31,33 @@ internals.ConnectionsSchema = new Mongoose.Schema({
   versionKey: false
 });
 
+internals.UpworkFiltersSchema = new Mongoose.Schema({
+  query: String,
+  title: String,
+  category: String,
+  subcategory: String,
+  job_type: {type: String, enum: ['hourly', 'fixed-price']},
+  duration: String,
+  workload: String,
+  client_feedback: String,
+  client_hires: String
+}, {
+  _id: false,
+  versionKey: false,
+  strict: 'throw'
+});
+
+internals.UpworkFiltersSchema.methods.setFilter = function(name, value) {
+  // Set filter value with "set" method, otherwise it's not validated.
+  this.set(name, value);
+};
+
 internals.UserSchema = new Mongoose.Schema({
   email: {type: String, required: true},
   first_name: {type: String, required: true},
   last_name: {type: String, required: true},
-  connections: {type: internals.ConnectionsSchema, required: true}
+  connections: {type: internals.ConnectionsSchema, required: true},
+  upwork_filters: {type: internals.UpworkFiltersSchema, required: true}
 }, {
   timestamps: {
     createdAt: 'created_at',
@@ -74,7 +96,8 @@ internals.UserSchema.statics.create = function(data, upwork, messenger) {
     email: data.user.email,
     first_name: data.user.first_name,
     last_name: data.user.last_name,
-    connections: {upwork, messenger}
+    connections: {upwork, messenger},
+    upwork_filters: {}
   };
   const user = new this(userData);
   return user.save();
