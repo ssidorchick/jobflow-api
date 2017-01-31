@@ -1,4 +1,3 @@
-import Hoek from 'hoek';
 import Mongoose from 'mongoose';
 import transform from './helpers/transform';
 

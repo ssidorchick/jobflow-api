@@ -22,6 +22,7 @@ internals.load = (plugin, next) => {
     {method: 'GET', path: '/messenger/webhook', config: handlers.Messenger.get},
     {method: 'POST', path: '/messenger/webhook', config: handlers.Messenger.post},
     {method: 'GET', path: '/messenger/authorize', config: handlers.Messenger.authorize},
+    {method: 'GET', path: '/messenger/crawler', config: handlers.Messenger.startCrawler},
     {method: 'GET', path: '/{path*}', config: handlers.Index.notFound}
   ]);
 

@@ -23,10 +23,26 @@ exports.post = {
     const User = this.models.User;
     const Upwork = this.models.Upwork;
     const Messenger = this.models.Messenger;
-    const messenger = new Messenger({config, User, Upwork});
+    const Crawler = this.models.Crawler;
+    const messenger = new Messenger({config, User, Upwork, Crawler});
 
     messenger.readMessage(payload);
     reply();
+  }
+};
+
+exports.startCrawler = {
+  auth: false,
+  handler: function(request, reply) {
+    const Job = this.models.Job;
+    const crawler = new this.models.Crawler();
+
+    crawler.start()
+      .then(result => reply(result))
+      .catch(err => {
+        console.log(err);
+        reply(err);
+      });
   }
 };
 

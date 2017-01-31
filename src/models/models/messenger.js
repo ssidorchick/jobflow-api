@@ -11,6 +11,10 @@ internals.Messenger = class {
     this.config = options.config;
     this.User = options.User;
     this.Upwork = options.Upwork;
+    this.Crawler = options.Crawler;
+
+    //const crawler = new this.Crawler({});
+    //console.log(crawler);
   }
 
   readMessage(data) {
@@ -161,6 +165,20 @@ internals.Messenger = class {
       });
   }
 
+  startCrawler(recipientId) {
+    const crawler = new this.Crawler();
+
+    crawler.start()
+      .then(result => {
+        console.log(result);
+        this.sendTextMessage(recipientId, 'crawler started');
+      })
+      .catch(err => {
+        console.log(err);
+        this.sendTextMessage(recipientId, 'crawler failed');
+      });
+  }
+
   _sendMessage(payload) {
     const url = `https://graph.facebook.com/v2.6/me/messages?access_token=${this.config.get('MESSENGER_ACCESS_TOKEN')}`;
 
@@ -232,6 +250,9 @@ internals.Messenger = class {
           break;
         case 'get job categories':
           this.sendJobCategoriesMessage(senderId);
+          break;
+        case 'start crawler':
+          this.startCrawler(senderId);
           break;
         default:
           this.sendTextMessage(senderId, messageText);
